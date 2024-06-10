@@ -34,19 +34,51 @@ def app(df, X, y):
     st.subheader("Select Values:")
 
     # Take input of features from the user
-    cp = st.selectbox('Type of chest pain experienced by patient: 0 typical angina, 1 atypical angina, 2 non-anginal pain, 3 asymptomatic (Nominal)', (0, 1, 2, 3))
-    sex = st.selectbox('Sex: 0-Female 1-Male', (0, 1))
-    fbs = st.selectbox('Fasting blood sugar: Enter 0 or 1', (0, 1))
-    restecg = st.selectbox('Resting electrocardiographic results: Enter 0, 1 or 2', (0, 1, 2))
-    exang = st.selectbox('Exercise induced angina: ', (0, 1))
-    slope = st.selectbox('The slope of the peak exercise ST segment: Enter 0, 1, 2, or 3', (0, 1, 2, 3))
-    ca = st.selectbox('Number of major vessels: Enter 0, 1, 2, or 3', (0, 1, 2, 3))
-    thal = st.selectbox('Thal: Enter 0, 1, or 2', (0, 1, 2))
+    # cp = st.selectbox('Type of chest pain experienced by patient:\n\n 0 - Typical Angina\n\n1 - Atypical Angina\n\n2 - Non-Anginal Pain\n\n3 - Asymptomatic', (0, 1, 2, 3))
+    sex_options = {"Female": 0, "Male": 1}
+    cp_options = {
+        "Typical Angina": 0,
+        "Atypical Angina": 1,
+        "Non-Anginal Pain": 2,
+        "Asymptomatic": 3
+    }
+    fbs_options = {"False": 0, "True": 1}
+    restecg_options = {
+        "Normal": 0,
+        "ST-T wave abnormality": 1,
+        "Left ventricular hypertrophy": 2
+    }
+    exang_options = {"No": 0, "Yes": 1}
+    slope_options = {
+        "Upsloping": 0,
+        "Flat": 1,
+        "Downsloping": 2
+    }
+    ca_options = {"0": 0, "1": 1, "2": 2, "3": 3}
+    thal_options = {
+        "NULL": 0,
+        "Normal": 1,
+        "Fixed Defect": 2,
+        "Reversible Defect": 3
+    }
+
+    # Nominal attribute select boxes
+    sex = sex_options[st.selectbox('Sex:', list(sex_options.keys()))]
+    cp = cp_options[st.selectbox('Type of chest pain experienced by patient:', list(cp_options.keys()))]
+    fbs = fbs_options[st.selectbox('Blood sugar levels on fasting > 120 mg/dl:', list(fbs_options.keys()))]
+    restecg = restecg_options[st.selectbox('Resting electrocardiographic results:', list(restecg_options.keys()))]
+    exang = exang_options[st.selectbox('Exercise induced angina:', list(exang_options.keys()))]
+    slope = slope_options[st.selectbox('The slope of the peak exercise ST segment:', list(slope_options.keys()))]
+    ca = ca_options[st.selectbox('Number of major vessels:', list(ca_options.keys()))]
+    thal = thal_options[st.selectbox('Thalassemia(Blood Disorder):', list(thal_options.keys()))]
+
+
+    # Numeric attribute sliders
     age = st.slider("Age", int(df["age"].min()), int(df["age"].max()))
     trestbps = st.slider("Resting blood pressure", int(df["trestbps"].min()), int(df["trestbps"].max()))
     chol = st.slider("Serum cholesterol in mg/dl", int(df["chol"].min()), int(df["chol"].max()))
     thalach = st.slider('Maximum heart rate achieved', int(df["thalach"].min()), int(df["thalach"].max()))
-    oldpeak = st.slider('Oldpeak: Enter a value between 0 and 6.2', float(df["oldpeak"].min()), float(df["oldpeak"].max()))
+    oldpeak = st.slider('Oldpeak', float(df["oldpeak"].min()), float(df["oldpeak"].max()))
 
     # Create a list to store all the features
     features = [cp, sex, fbs, restecg, exang, slope, ca, thal, age, trestbps, chol, thalach, oldpeak]

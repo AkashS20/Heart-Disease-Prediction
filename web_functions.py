@@ -13,14 +13,14 @@ import streamlit as st
 
 def load_data():
     """This function returns the preprocessed data"""
-    # Load the Diabetes dataset into DataFrame.
-    df = pd.read_csv('dataset.csv')
+    # Load the Diabetes dataset into DataFrame. [1]
+    df = pd.read_csv('dataset.csv') 
 
     # Rename the column names in the DataFrame.
     
-    # Perform feature and target split
-    X = df[["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal"]]
-    y = df['target']
+    # Perform feature and target split [2]
+    X = df.iloc[:, :-1]
+    y = df.iloc[:, -1]
 
     categorical_val = []
     continuous_val = []
@@ -30,6 +30,7 @@ def load_data():
         else:
             continuous_val.append(column)
     scaler = StandardScaler()
+
     X[continuous_val] = scaler.fit_transform(X[continuous_val])
     # X = X.values
 
@@ -38,7 +39,6 @@ def load_data():
     return df, X, y
 
 # Decision Tree
-
 def train_decision_tree(X, y):
     """This function trains the Decision Tree model and returns the model and model score"""
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
@@ -62,7 +62,6 @@ def predict_decision_tree(X, y, features):
     return prediction, score
 
 # Logistic Regression
-
 def train_logistic_regression(X, y):
     """This function trains the Logistic Regression model and returns the model and model score"""
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
@@ -79,7 +78,6 @@ def predict_logistic_regression(X, y, features):
     return prediction, score
 
 # XGBoost Classifier
-
 def train_xgb_classifier(X, y):
     """This function trains the XGBoost model and returns the model and model score"""
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
@@ -96,7 +94,6 @@ def predict_xgb_classifier(X, y, features):
     return prediction, score
 
 # Random Forest Classifier
-
 def train_random_forest(X, y):
     """This function trains the Random Forest model and returns the model and model score"""
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
