@@ -1,7 +1,9 @@
-"""This module contains data about prediction page"""
+"""This module contains data about the prediction page"""
 
 # Import necessary modules
 import streamlit as st
+import datetime
+import sqlite3
 
 # Import necessary functions from web_functions
 from web_functions import (
@@ -11,9 +13,50 @@ from web_functions import (
     predict_random_forest
 )
 
+def create_table():
+    """Create the predictions table if it doesn't exist"""
+    conn = sqlite3.connect('predictions.db')
+    c = conn.cursor()
+    # c.execute('''drop table if exists predictions''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS predictions (
+            model TEXT,
+            cp INTEGER,
+            sex INTEGER,
+            fbs INTEGER,
+            restecg INTEGER,
+            exang INTEGER,
+            slope INTEGER,
+            ca INTEGER,
+            thal INTEGER,
+            age INTEGER,
+            trestbps INTEGER,
+            chol INTEGER,
+            thalach INTEGER,
+            oldpeak REAL,
+            prediction INTEGER
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+def log_prediction_to_db(model, features, prediction):
+    """Log the prediction details to the SQLite database"""
+    conn = sqlite3.connect('predictions.db')
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO predictions (
+            model, cp, sex, fbs, restecg, exang, slope, ca, thal,
+            age, trestbps, chol, thalach, oldpeak, prediction
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (model, *features, prediction))
+    conn.commit()
+    conn.close()
+
 def app(df, X, y):
     """This function creates the prediction page"""
-
+    create_table()
+    
     # List of models
     models = ['Random Forest Classification', 'Logistic Regression Classification', 'XGBoost Classification', 'Decision Tree Classification']
     model = st.sidebar.selectbox('Which model would you like to use?', models)
@@ -34,7 +77,6 @@ def app(df, X, y):
     st.subheader("Select Values:")
 
     # Take input of features from the user
-    # cp = st.selectbox('Type of chest pain experienced by patient:\n\n 0 - Typical Angina\n\n1 - Atypical Angina\n\n2 - Non-Anginal Pain\n\n3 - Asymptomatic', (0, 1, 2, 3))
     sex_options = {"Female": 0, "Male": 1}
     cp_options = {
         "Typical Angina": 0,
@@ -70,11 +112,10 @@ def app(df, X, y):
     exang = exang_options[st.selectbox('Exercise induced angina:', list(exang_options.keys()))]
     slope = slope_options[st.selectbox('The slope of the peak exercise ST segment:', list(slope_options.keys()))]
     ca = ca_options[st.selectbox('Number of major vessels:', list(ca_options.keys()))]
-    thal = thal_options[st.selectbox('Thalassemia(Blood Disorder):', list(thal_options.keys()))]
-
+    thal = thal_options[st.selectbox('Thalassemia (Blood Disorder):', list(thal_options.keys()))]
 
     # Numeric attribute sliders
-    age = st.slider("Age", int(df["age"].min()), int(df["age"].max()))
+    age = st.slider("Age", 18, 80)
     trestbps = st.slider("Resting blood pressure", int(df["trestbps"].min()), int(df["trestbps"].max()))
     chol = st.slider("Serum cholesterol in mg/dl", int(df["chol"].min()), int(df["chol"].max()))
     thalach = st.slider('Maximum heart rate achieved', int(df["thalach"].min()), int(df["thalach"].max()))
@@ -103,4 +144,14 @@ def app(df, X, y):
             st.success("The person is relatively safe from cardiac arrest")
 
         # Print the score of the model
-        st.write("The model used is trusted by doctors and has an accuracy of ", (score * 100), "%")
+        st.write("This model has an accuracy of ", (score * 100), "%")
+
+        # Log to file
+        prediction = int(prediction[0])
+        with open('logs.txt', 'a') as f:
+            log_entry = f"{datetime.datetime.now()}, Model: {model}, Features: {features}, Prediction: {prediction}\n"
+            f.write(log_entry)
+        
+        # Log to SQLite
+        log_prediction_to_db(model, features, prediction)
+

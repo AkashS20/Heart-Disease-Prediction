@@ -1,8 +1,25 @@
-"""This modules contains data about home page"""
+"""This module contains data about home page"""
 
 # Import necessary modules
 import streamlit as st
+import pandas as pd
+import sqlite3
 
+def fetch_all_rows():
+    """Fetch all rows from the SQLite database"""
+    conn = sqlite3.connect('predictions.db')
+    query = "SELECT * FROM predictions"
+    df = pd.read_sql(query, conn)
+    conn.close()
+    return df
+
+def clear_dataset():
+    """Clear all rows from the SQLite database"""
+    conn = sqlite3.connect('predictions.db')
+    c = conn.cursor()
+    c.execute("DELETE FROM predictions")
+    conn.commit()
+    conn.close()
 
 def app(df):
     """This function create the Data Info page"""
@@ -38,12 +55,25 @@ def app(df):
         if st.checkbox("Columns data types"):
             dtypes = df.dtypes.apply(lambda x: x.name)
             st.dataframe(dtypes)
-    
+
     # Show data for each columns
     with col_data: 
         if st.checkbox("Columns Data"):
             col = st.selectbox("Column Name", list(df.columns))
             st.dataframe(df[col])
+
+    # Add margin above the Fetch All Predictions button
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    if st.button("Fetch Past Predictions"):
+        predictions_df = fetch_all_rows()
+        st.dataframe(predictions_df)
+
+    if st.button("Clear Database"):
+        clear_dataset()
+        st.success("Database cleared successfully")
+    
+    
 
     # Add the link to you dataset
     st.markdown("""

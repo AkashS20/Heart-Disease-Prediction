@@ -49,12 +49,6 @@ def app(df, X, y):
     # Create a checkbox to show correlation heatmap
     if st.checkbox("Show Correlation with Target Feature"):
         st.subheader("Correlation Heatmap")
-
-        # fig = plt.figure(figsize = (8, 6))
-        # ax = sns.heatmap(df.iloc[:, 1:].corr(), annot = True)   # Creating an object of seaborn axis and storing it in 'ax' variable
-        # bottom, top = ax.get_ylim()                             # Getting the top and bottom margin limits.
-        # ax.set_ylim(bottom + 0.5, top - 0.5)                    # Increasing the bottom and decreasing the top margins respectively.
-        # st.pyplot(fig)
         sns.set_context('notebook', font_scale=2.3)
 
         # Create the bar plot for correlation with target

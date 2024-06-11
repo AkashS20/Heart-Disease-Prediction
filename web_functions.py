@@ -42,13 +42,7 @@ def load_data():
 def train_decision_tree(X, y):
     """This function trains the Decision Tree model and returns the model and model score"""
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
-    model = DecisionTreeClassifier(
-        ccp_alpha=0.0, class_weight=None, criterion='entropy',
-        max_depth=4, max_features=None, max_leaf_nodes=None,
-        min_impurity_decrease=0.0, min_samples_leaf=1, 
-        min_samples_split=2, min_weight_fraction_leaf=0.0,
-        random_state=42, splitter='best'
-    )
+    model = DecisionTreeClassifier(max_depth = 3)
     model.fit(X_train, y_train)
     score = model.score(X_test, y_test)
     return model, score
@@ -81,11 +75,16 @@ def predict_logistic_regression(X, y, features):
 def train_xgb_classifier(X, y):
     """This function trains the XGBoost model and returns the model and model score"""
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
-    model = XGBClassifier(random_state=42)
+    model = XGBClassifier(base_score=0.5, booster='gbtree', colsample_bylevel=1,
+        colsample_bynode=1, colsample_bytree=0.4, gamma=0.2,
+        learning_rate=0.1, max_delta_step=0, max_depth=15,
+        min_child_weight=1, missing=1, n_estimators=100, n_jobs=1,
+        nthread=None, objective='binary:logistic', random_state=23,
+        reg_alpha=0, reg_lambda=1, scale_pos_weight=1, seed=None,
+        silent=None, subsample=1, verbosity=1)
     model.fit(X_train, y_train)
     score = model.score(X_test, y_test)
     return model, score
-
 
 def predict_xgb_classifier(X, y, features):
     """This function trains the XGBoost model and makes predictions"""
@@ -97,7 +96,7 @@ def predict_xgb_classifier(X, y, features):
 def train_random_forest(X, y):
     """This function trains the Random Forest model and returns the model and model score"""
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
-    model = RandomForestClassifier(random_state=42)
+    model = RandomForestClassifier(n_estimators = 10, random_state=42)
     model.fit(X_train, y_train)
     score = model.score(X_test, y_test)
     return model, score
