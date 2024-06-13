@@ -2,6 +2,7 @@
 
 # Import necessary modules
 import streamlit as st
+import pandas as pd
 import datetime
 import sqlite3
 
@@ -17,23 +18,22 @@ def create_table():
     """Create the predictions table if it doesn't exist"""
     conn = sqlite3.connect('predictions.db')
     c = conn.cursor()
-    # c.execute('''drop table if exists predictions''')
     c.execute('''
         CREATE TABLE IF NOT EXISTS predictions (
             model TEXT,
-            cp INTEGER,
+            age INTEGER,
             sex INTEGER,
+            cp INTEGER,
+            trestbps INTEGER,
+            chol INTEGER,
             fbs INTEGER,
             restecg INTEGER,
+            thalach INTEGER,
             exang INTEGER,
+            oldpeak REAL,
             slope INTEGER,
             ca INTEGER,
             thal INTEGER,
-            age INTEGER,
-            trestbps INTEGER,
-            chol INTEGER,
-            thalach INTEGER,
-            oldpeak REAL,
             prediction INTEGER
         )
     ''')
@@ -46,14 +46,13 @@ def log_prediction_to_db(model, features, prediction):
     c = conn.cursor()
     c.execute('''
         INSERT INTO predictions (
-            model, cp, sex, fbs, restecg, exang, slope, ca, thal,
-            age, trestbps, chol, thalach, oldpeak, prediction
+            model, age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal, prediction
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (model, *features, prediction))
     conn.commit()
     conn.close()
 
-def app(df, X, y):
+def app(df, X, y, scaler, continuous_val):
     """This function creates the prediction page"""
     create_table()
     
@@ -122,26 +121,30 @@ def app(df, X, y):
     oldpeak = st.slider('Oldpeak', float(df["oldpeak"].min()), float(df["oldpeak"].max()))
 
     # Create a list to store all the features
-    features = [cp, sex, fbs, restecg, exang, slope, ca, thal, age, trestbps, chol, thalach, oldpeak]
+    features = [age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]
+    features_df = pd.DataFrame([features], columns=["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal"])
 
     # Create a button to predict
     if st.button("Predict"):
+        # Scale input features
+        features_df[continuous_val] = scaler.transform(features_df[continuous_val])
+        # st.write(features_df)
         if model == 'Random Forest Classification':
-            prediction, score = predict_random_forest(X, y, features)
+            prediction, score = predict_random_forest(X, y, features_df)
         elif model == 'Logistic Regression Classification':
-            prediction, score = predict_logistic_regression(X, y, features)
+            prediction, score = predict_logistic_regression(X, y, features_df)
         elif model == 'XGBoost Classification':
-            prediction, score = predict_xgb_classifier(X, y, features)
+            prediction, score = predict_xgb_classifier(X, y, features_df)
         elif model == 'Decision Tree Classification':
-            prediction, score = predict_decision_tree(X, y, features)
+            prediction, score = predict_decision_tree(X, y, features_df)
         
         st.info("Prediction Successful")
 
         # Print the output according to the prediction
         if prediction == 1:
-            st.warning("The person is prone to getting a cardiac arrest!!")
+            st.warning("The person is prone to getting a heart disease!!")
         else:
-            st.success("The person is relatively safe from cardiac arrest")
+            st.success("The person is relatively safe from heart disease")
 
         # Print the score of the model
         st.write("This model has an accuracy of ", (score * 100), "%")

@@ -13,12 +13,11 @@ import streamlit as st
 
 def load_data():
     """This function returns the preprocessed data"""
-    # Load the Diabetes dataset into DataFrame. [1]
-    df = pd.read_csv('dataset.csv') 
-
-    # Rename the column names in the DataFrame.
     
-    # Perform feature and target split [2]
+    df = pd.read_csv('dataset.csv') 
+    df.dropna()
+
+    # Perform feature and target split
     X = df.iloc[:, :-1]
     y = df.iloc[:, -1]
 
@@ -29,14 +28,11 @@ def load_data():
             categorical_val.append(column)
         else:
             continuous_val.append(column)
+    
     scaler = StandardScaler()
-
     X[continuous_val] = scaler.fit_transform(X[continuous_val])
-    # X = X.values
-
-
-
-    return df, X, y
+    # st.write(continuous_val)
+    return df, X, y, scaler, continuous_val
 
 # Decision Tree
 def train_decision_tree(X, y):
@@ -47,12 +43,10 @@ def train_decision_tree(X, y):
     score = model.score(X_test, y_test)
     return model, score
 
-
-
 def predict_decision_tree(X, y, features):
     """This function trains the Decision Tree model and makes predictions"""
     model, score = train_decision_tree(X, y)
-    prediction = model.predict(np.array(features).reshape(1, -1))
+    prediction = model.predict(features)
     return prediction, score
 
 # Logistic Regression
@@ -68,7 +62,7 @@ def train_logistic_regression(X, y):
 def predict_logistic_regression(X, y, features):
     """This function trains the Logistic Regression model and makes predictions"""
     model, score = train_logistic_regression(X, y)
-    prediction = model.predict(np.array(features).reshape(1, -1))
+    prediction = model.predict(features)
     return prediction, score
 
 # XGBoost Classifier
@@ -89,7 +83,7 @@ def train_xgb_classifier(X, y):
 def predict_xgb_classifier(X, y, features):
     """This function trains the XGBoost model and makes predictions"""
     model, score = train_xgb_classifier(X, y)
-    prediction = model.predict(np.array(features).reshape(1, -1))
+    prediction = model.predict(features)
     return prediction, score
 
 # Random Forest Classifier
@@ -105,5 +99,5 @@ def train_random_forest(X, y):
 def predict_random_forest(X, y, features):
     """This function trains the Random Forest model and makes predictions"""
     model, score = train_random_forest(X, y)
-    prediction = model.predict(np.array(features).reshape(1, -1))
+    prediction = model.predict(features)
     return prediction, score

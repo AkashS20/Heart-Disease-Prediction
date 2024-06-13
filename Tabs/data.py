@@ -79,7 +79,7 @@ def app(df):
     st.markdown("""
                     <p style="font-size:24px">
                         <a 
-                            href="https://www.kaggle.com/datasets/ritwikb3/heart-disease-cleveland"
+                            href="https://raw.githubusercontent.com/AkashS20/Heart-Disease-Prediction/master/dataset.csv?token=GHSAT0AAAAAACSWJOE5NBCIUXFWY4ANQFXYZTKQBIQ"
                             target=_blank
                             style="text-decoration:none;"
                         >Get Dataset

@@ -30,7 +30,7 @@ Tabs = {
 
 
 # Loading the dataset.
-df, X, y = load_data()
+df, X, y, scaler, continuous_val = load_data()
 
 pages = ["Home", "Prediction", "Data Info", "Visualisation"]
 
@@ -40,9 +40,10 @@ page = st_navbar(
 )
 
 
-if page in ["Prediction", "Visualisation"]:
+if page == "Prediction":
+    Tabs[page].app(df, X, y, scaler, continuous_val)
+elif (page == "Visualisation"):
     Tabs[page].app(df, X, y)
-    # st.sidear.visible = True
 elif (page == "Data Info"):
     Tabs[page].app(df)
 else:

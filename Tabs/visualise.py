@@ -4,7 +4,7 @@
 import warnings
 import matplotlib.pyplot as plt
 import seaborn as sns
-'''from sklearn.metrics import plot_confusion_matrix'''
+
 from sklearn import tree
 import streamlit as st
 from web_functions import (
