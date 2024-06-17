@@ -69,13 +69,10 @@ def predict_logistic_regression(X, y, features):
 def train_xgb_classifier(X, y):
     """This function trains the XGBoost model and returns the model and model score"""
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
-    model = XGBClassifier(base_score=0.5, booster='gbtree', colsample_bylevel=1,
-        colsample_bynode=1, colsample_bytree=0.4, gamma=0.2,
-        learning_rate=0.1, max_delta_step=0, max_depth=15,
-        min_child_weight=1, missing=1, n_estimators=100, n_jobs=1,
-        nthread=None, objective='binary:logistic', random_state=23,
-        reg_alpha=0, reg_lambda=1, scale_pos_weight=1, seed=None,
-        silent=None, subsample=1, verbosity=1)
+    model = XGBClassifier(
+        colsample_bytree=0.96, gamma=0.04,
+        learning_rate=0.09, max_depth=13,
+        subsample=0.63, min_child_weight=5)
     model.fit(X_train, y_train)
     score = model.score(X_test, y_test)
     return model, score
