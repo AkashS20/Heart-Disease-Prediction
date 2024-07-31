@@ -20,10 +20,6 @@ from web_functions import train_decision_tree
 
 def app(df, X, y):
     """This function create the visualisation page"""
-    
-    # Remove the warnings
-    warnings.filterwarnings('ignore')
-    st.set_option('deprecation.showPyplotGlobalUse', False)
 
     # Set the page title
     st.title("Visualise Heart Ailment Demographics")
